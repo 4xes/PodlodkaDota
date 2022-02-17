@@ -1,1 +1,1 @@
-<video src='/gifs/collapse.mp4?raw=true' width=300 height=620></video>
+<img src="/gifs/collapse.gif?raw=true" width=300 height=620 alt="Demo">
