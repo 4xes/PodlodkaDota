@@ -9,12 +9,13 @@ data class AppData(
     val tags: List<String>,
     val description: String,
     val media: List<Media>,
-    val reviews: List<Review>
+    val reviews: List<Review>,
+    var rating: Rating
 ) {
 
     companion object {
         val testData = AppData(
-            "Dota",
+            "DoTA 2",
             image = R.drawable.dota_back_image,
             icon = R.drawable.dota_icon,
             tags = listOf("Moba", "Multiplayer", "Strategy"),
@@ -44,7 +45,8 @@ data class AppData(
                     date = "February 14, 2019", //todo timestamp
                     text = "“Once you start to learn its secrets, there’s a wild and exciting variety of play here that’s unmatched, even by its peers.”"
                 )
-            )
+            ),
+            rating = Rating(4.9f, "70M")
         )
     }
 
@@ -57,7 +59,7 @@ data class AppData(
     }
 
     data class Rating(
-        val rating: Float,
+        val value: Float,
         val countReviews: String
     )
 

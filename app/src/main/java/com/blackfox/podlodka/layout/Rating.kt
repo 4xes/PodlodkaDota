@@ -25,8 +25,8 @@ private enum class StarState {
 }
 
 @Composable
-fun RatingBar(rating: Float) {
-    Row(modifier = Modifier) {
+fun RatingBar(modifier: Modifier = Modifier, rating: Float) {
+    Row(modifier = modifier) {
         for (i in 0 until 5) {
             val starState = if (rating > i) {
                 if (rating < i + 1) {
