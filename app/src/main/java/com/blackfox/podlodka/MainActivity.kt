@@ -12,12 +12,14 @@ import androidx.constraintlayout.compose.ExperimentalMotionApi
 import com.blackfox.podlodka.data.AppData
 import com.blackfox.podlodka.ui.theme.Background
 import com.blackfox.podlodka.ui.theme.PodlodkaAnimationTheme
+import com.blackfox.podlodka.utils.ThemeController
 
 @ExperimentalMotionApi
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeController.applyTransparent(this)
         setContent {
             PodlodkaAnimationTheme {
                 // A surface container using the 'background' color from the theme

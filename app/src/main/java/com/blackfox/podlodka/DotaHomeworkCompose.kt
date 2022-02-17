@@ -1,5 +1,6 @@
 package com.blackfox.podlodka
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -52,8 +53,6 @@ import com.blackfox.podlodka.ui.theme.Background
 import com.blackfox.podlodka.ui.theme.Shapes
 import com.blackfox.podlodka.ui.theme.fonts
 import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.statusBarsPadding
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -155,19 +154,23 @@ fun Rating(modifier: Modifier = Modifier, rating: AppData.Rating) {
 
 }
 
-val AppBarCollapsedHeight = 56.dp
+val AppBarCollapsedHeight = 56.dp + 48.dp
 val AppBarExpendedHeight = 363.dp
-val ImageExpanded = 296.dp
+val ImageHeight = 296.dp
+val titlePadding = 24.dp
 
 @Composable
 fun AppBar(appData: AppData, scrollState: LazyListState) {
-    val maxOffset = with(LocalDensity.current) {
-        ImageExpanded.roundToPx()
-    } - LocalWindowInsets.current.systemBars.layoutInsets.top
+    val titlePaddingPx = with(LocalDensity.current) {
+        24.dp.roundToPx()
+    }
+    val imageOffset = with(LocalDensity.current) {
+        ImageHeight.roundToPx()
+    }
 
-    val offset = min(scrollState.firstVisibleItemScrollOffset, maxOffset)
+    val offset = min(scrollState.firstVisibleItemScrollOffset, imageOffset)
 
-    val offsetProgress = max(0f, offset * 3f - 2f * maxOffset) / maxOffset
+    val offsetProgress = max(0f, offset * 3f - 2f * imageOffset) / imageOffset
 
     TopAppBar(
         contentPadding = PaddingValues(),
@@ -179,18 +182,18 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
             .offset {
                 IntOffset(x = 0, y = -offset)
             },
-        elevation = if (offset == maxOffset) 4.dp else 0.dp
+        elevation = if (offset == imageOffset) 4.dp else 0.dp
     ) {
         Box(modifier = Modifier) {
             Column {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(ImageExpanded)
+                        .height(ImageHeight)
                 ) {
                     Image(
                         modifier = Modifier
-                            .height(294.dp)
+                            .height(ImageHeight)
                             .fillMaxWidth(),
                         painter = painterResource(id = R.drawable.dota_back_image),
                         contentDescription = "",
@@ -210,6 +213,14 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
                     )
                 }
                 val iconOffset = 48.dp + 88.dp * (1f - offsetProgress)
+
+                var titlePaddingProgress = 0f
+                if (scrollState.firstVisibleItemScrollOffset > imageOffset - titlePaddingPx) {
+                    titlePaddingProgress = min(
+                        scrollState.firstVisibleItemScrollOffset - (imageOffset - titlePaddingPx).toFloat(),
+                        titlePaddingPx.toFloat()
+                    ) / titlePaddingPx.toFloat()
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -225,6 +236,7 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
                         maxLines = 1,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
+                            .padding(top = com.blackfox.podlodka.titlePadding * titlePaddingProgress)
                             .scale(1f - 0.25f * offsetProgress),
                         fontFamily = fonts
                     )
@@ -264,9 +276,8 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .statusBarsPadding()
-            .height(AppBarCollapsedHeight + 24.dp)
-            .padding(start = 24.dp, top = 24.dp, end = 24.dp)
+            .height(AppBarCollapsedHeight)
+            .padding(start = 24.dp, top = 48.dp, end = 24.dp)
     ) {
         ActionButton(
             modifier = Modifier
@@ -306,7 +317,11 @@ fun Tags(modifier: Modifier = Modifier, tags: List<String>) {
 }
 
 @Composable
-fun MediaList(modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp), list: List<AppData.Media>) {
+fun MediaList(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    list: List<AppData.Media>
+) {
     LazyRow(
         contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -343,7 +358,10 @@ fun Content(appData: AppData, scrollState: LazyListState) {
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp),
                     description = appData.description
                 )
-                MediaList(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 24.dp), list = appData.media)
+                MediaList(
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 24.dp),
+                    list = appData.media
+                )
                 Rating(
                     modifier = Modifier.padding(start = 24.dp, end = 24.dp),
                     rating = appData.rating
@@ -361,7 +379,7 @@ fun Content(appData: AppData, scrollState: LazyListState) {
                 review = it
             )
         }
-        item { 
+        item {
             Spacer(modifier = Modifier.height(buttonSizeWithPadding))
         }
     }
