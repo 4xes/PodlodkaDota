@@ -20,11 +20,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -172,9 +176,26 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
 
     val offsetProgress = max(0f, offset * 3f - 2f * imageOffset) / imageOffset
 
+
+    val backgroundFillDx =
+        scrollState.firstVisibleItemScrollOffset - (imageOffset - titlePaddingPx).toFloat()
+    var backgroundProgress = 0f
+    if (backgroundFillDx > 0f) {
+        backgroundProgress = min(
+            backgroundFillDx,
+            titlePaddingPx.toFloat()
+        ) / titlePaddingPx.toFloat()
+    }
+
+    //Log.e("Test", backgroundProgress.toString())
+
+    val overColor = Color.Black.copy(0.4f * backgroundProgress)
+    val toolbarColor = Color(0xFF050B18)
+    val backgroundColor = overColor.compositeOver(toolbarColor)
+
     TopAppBar(
         contentPadding = PaddingValues(),
-        backgroundColor = Color(0xFF050B18),
+        backgroundColor = backgroundColor,
         modifier = Modifier
             .height(
                 AppBarExpendedHeight
@@ -184,6 +205,10 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
             },
         elevation = if (offset == imageOffset) 4.dp else 0.dp
     ) {
+//        Row(modifier = ) {
+//            Icon(painter = painterResource(id = R.drawable.ic_back), contentDescription = "")
+//            Icon(painter = painterResource(id = R.drawable.ic_dots), contentDescription = "")
+//        }
         Box(modifier = Modifier) {
             Column {
                 Box(
@@ -215,9 +240,12 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
                 val iconOffset = 48.dp + 88.dp * (1f - offsetProgress)
 
                 var titlePaddingProgress = 0f
-                if (scrollState.firstVisibleItemScrollOffset > imageOffset - titlePaddingPx) {
+
+                val titleDxOffset =
+                    scrollState.firstVisibleItemScrollOffset - (imageOffset - titlePaddingPx).toFloat()
+                if (titleDxOffset > 0f) {
                     titlePaddingProgress = min(
-                        scrollState.firstVisibleItemScrollOffset - (imageOffset - titlePaddingPx).toFloat(),
+                        titleDxOffset,
                         titlePaddingPx.toFloat()
                     ) / titlePaddingPx.toFloat()
                 }
@@ -368,16 +396,21 @@ fun Content(appData: AppData, scrollState: LazyListState) {
                 )
             }
         }
-        items(appData.reviews) {
+        itemsIndexed(appData.reviews) { index, review ->
             Review(
                 modifier = Modifier.padding(
-                    start = 24.dp,
-                    top = 24.dp,
-                    end = 24.dp,
-                    bottom = 24.dp
+                    vertical = 24.dp,
+                    horizontal = 24.dp
                 ),
-                review = it
+                review = review
             )
+            if (index < appData.reviews.lastIndex) {
+                Divider(
+                    modifier = Modifier.padding(horizontal = 38.dp),
+                    color = Color(0xFF1A1F29),
+                    thickness = 1.dp
+                )
+            }
         }
         item {
             Spacer(modifier = Modifier.height(buttonSizeWithPadding))
