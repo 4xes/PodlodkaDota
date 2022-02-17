@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -38,7 +40,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +48,10 @@ import com.blackfox.podlodka.layout.ActionButton
 import com.blackfox.podlodka.layout.RatingBar
 import com.blackfox.podlodka.layout.Tag
 import com.blackfox.podlodka.ui.theme.AppIcons
+import com.blackfox.podlodka.ui.theme.Background
+import com.blackfox.podlodka.ui.theme.Shapes
 import com.blackfox.podlodka.ui.theme.fonts
+import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.statusBarsPadding
 import java.util.*
@@ -61,9 +65,51 @@ fun DotaHomeworkCompose(appData: AppData) {
     Box {
         Content(appData, scrollState)
         AppBar(appData, scrollState)
+        BottomGradient(modifier = Modifier.align(Alignment.BottomCenter))
+        InstallButton(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
+val buttonSizeWithPadding = 24.dp + 64.dp + 24.dp
+
+@Composable
+fun BottomGradient(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color.Transparent, Background
+                    )
+                )
+            )
+            .fillMaxWidth()
+            .height(buttonSizeWithPadding)
+    )
+}
+
+@Composable
+fun InstallButton(modifier: Modifier = Modifier) {
+    Button(
+        modifier = modifier
+            .padding(horizontal = 24.dp, vertical = 24.dp)
+            .fillMaxWidth()
+            .height(64.dp),
+        onClick = {},
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF4D144)),
+        shape = Shapes.large,
+    ) {
+        Text(
+            text = "Install",
+            textAlign = TextAlign.Start,
+            fontSize = 20.sp,
+            letterSpacing = 0.6.sp,
+            color = Color(0xFF050B18),
+            fontWeight = FontWeight.Bold,
+            fontFamily = fonts
+        )
+    }
+}
 
 @Composable
 fun Rating(modifier: Modifier = Modifier, rating: AppData.Rating) {
@@ -77,8 +123,10 @@ fun Rating(modifier: Modifier = Modifier, rating: AppData.Rating) {
             fontWeight = FontWeight.Bold,
             fontFamily = fonts
         )
-        Row(modifier = Modifier
-            .padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier
+                .padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 text = rating.value.toString(),
                 textAlign = TextAlign.Start,
@@ -193,6 +241,7 @@ fun AppBar(appData: AppData, scrollState: LazyListState) {
                             fontSize = 12.sp,
                             letterSpacing = 0.5.sp,
                             color = Color(0xFF45454D),
+                            fontFamily = fonts
                         )
                     }
                 }
@@ -242,28 +291,24 @@ fun Description(modifier: Modifier = Modifier, description: String) {
         letterSpacing = 0.sp,
         lineHeight = 19.sp,
         color = Color(0xFFA8ADB7),
+        fontFamily = fonts
     )
 
 }
 
 @Composable
 fun Tags(modifier: Modifier = Modifier, tags: List<String>) {
-    Row(modifier = modifier) {
+    FlowRow(modifier = modifier, mainAxisSpacing = 10.dp, crossAxisSpacing = 10.dp) {
         for (tag in tags) {
-            Tag(Modifier.padding(end = 10.dp), text = tag.uppercase(Locale.ENGLISH))
+            Tag(text = tag.uppercase(Locale.ENGLISH))
         }
     }
 }
 
 @Composable
-fun MediaList(modifier: Modifier = Modifier, list: List<AppData.Media>) {
+fun MediaList(modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp), list: List<AppData.Media>) {
     LazyRow(
-        contentPadding = PaddingValues(
-            start = 24.dp,
-            top = 24.dp,
-            end = 24.dp,
-            bottom = 24.dp
-        ),
+        contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(list) {
@@ -282,6 +327,7 @@ fun MediaList(modifier: Modifier = Modifier, list: List<AppData.Media>) {
         }
     }
 }
+
 @Composable
 fun Content(appData: AppData, scrollState: LazyListState) {
     LazyColumn(contentPadding = PaddingValues(top = AppBarExpendedHeight), state = scrollState) {
@@ -297,20 +343,26 @@ fun Content(appData: AppData, scrollState: LazyListState) {
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp),
                     description = appData.description
                 )
-                MediaList(list = appData.media)
+                MediaList(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 24.dp), list = appData.media)
                 Rating(
                     modifier = Modifier.padding(start = 24.dp, end = 24.dp),
                     rating = appData.rating
                 )
-                for (review in appData.reviews) {
-                    Review(modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 24.dp),
-                        review = review)
-                }
-
-                Button(onClick = {  }) {
-                    Text(text = "Install")
-                }
             }
+        }
+        items(appData.reviews) {
+            Review(
+                modifier = Modifier.padding(
+                    start = 24.dp,
+                    top = 24.dp,
+                    end = 24.dp,
+                    bottom = 24.dp
+                ),
+                review = it
+            )
+        }
+        item { 
+            Spacer(modifier = Modifier.height(buttonSizeWithPadding))
         }
     }
 }
@@ -323,12 +375,12 @@ fun Review(modifier: Modifier = Modifier, review: AppData.Review) {
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape),
-                painter = painterResource(id = review.author.avatar),
+                painter = painterResource(id = review.authorAvatar),
                 contentDescription = "Avatar"
             )
             Column(modifier = Modifier.padding(start = 16.dp)) {
                 Text(
-                    text = review.author.name,
+                    text = review.authorName,
                     textAlign = TextAlign.Start,
                     fontSize = 16.sp,
                     letterSpacing = 0.5.sp,
@@ -336,6 +388,7 @@ fun Review(modifier: Modifier = Modifier, review: AppData.Review) {
                     modifier = Modifier
                         .fillMaxWidth(),
                     color = Color.White,
+                    fontFamily = fonts
                 )
                 Text(
                     text = review.date,
@@ -345,6 +398,7 @@ fun Review(modifier: Modifier = Modifier, review: AppData.Review) {
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
                     color = Color(0xFF696D74),
+                    fontFamily = fonts
                 )
 
             }
@@ -356,7 +410,8 @@ fun Review(modifier: Modifier = Modifier, review: AppData.Review) {
             fontSize = 12.sp,
             letterSpacing = 0.5.sp,
             lineHeight = 20.sp,
-            color = Color(0xFFA8ADB7)
+            color = Color(0xFFA8ADB7),
+            fontFamily = fonts
         )
 
     }

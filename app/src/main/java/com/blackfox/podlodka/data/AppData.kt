@@ -18,7 +18,7 @@ data class AppData(
             "DoTA 2",
             image = R.drawable.dota_back_image,
             icon = R.drawable.dota_icon,
-            tags = listOf("Moba", "Multiplayer", "Strategy"),
+            tags = listOf("Moba", "Multiplayer", "Strategy", "VK", "Podlodka", "Compose", "Jetpack"),
             description = "Dota 2 is a multiplayer online battle arena (MOBA) game which has two teams of five players compete to collectively destroy a large structure defended by the opposing team known as the \"Ancient\", whilst defending their own.",
             media = listOf(
                 Media(
@@ -30,18 +30,14 @@ data class AppData(
             ),
             reviews = listOf(
                 Review(
-                    author = ReviewAuthor(
-                        avatar = R.drawable.dota_avatar_id1,
-                        name = "Auguste Conte"
-                    ),
+                    authorAvatar = R.drawable.dota_avatar_id1,
+                    authorName = "Auguste Conte",
                     date = "February 14, 2019", //todo timestamp
                     text = "“Once you start to learn its secrets, there’s a wild and exciting variety of play here that’s unmatched, even by its peers.”"
                 ),
                 Review(
-                    author = ReviewAuthor(
-                        avatar = R.drawable.dota_avatar_id2,
-                        name = "Jang Marcelino"
-                    ),
+                    authorAvatar = R.drawable.dota_avatar_id2,
+                    authorName = "Jang Marcelino",
                     date = "February 14, 2019", //todo timestamp
                     text = "“Once you start to learn its secrets, there’s a wild and exciting variety of play here that’s unmatched, even by its peers.”"
                 )
@@ -62,14 +58,9 @@ data class AppData(
         val value: Float,
         val countReviews: String
     )
-
-    data class ReviewAuthor(
-        val avatar: Int,
-        val name: String
-    )
-
     data class Review(
-        val author: ReviewAuthor,
+        val authorAvatar: Int,
+        val authorName: String,
         val date: String,
         val text: String
     )
